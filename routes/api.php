@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/posts/{post}/comments', [PostController::class, 'saveComment'])->name('comments.store');
     Route::get('/posts/{post}/comments', [PostController::class, 'viewComments'])->name('comments.index');
-    Route::delete('/posts/{post}/comments/{comment}', [PostController::class, 'deleteComment'])->name('comments.destroy');
+    Route::delete('/comments/{comment}', [PostController::class, 'deleteComment'])->name('comments.destroy');
 });
 
 Route::fallback(function () {

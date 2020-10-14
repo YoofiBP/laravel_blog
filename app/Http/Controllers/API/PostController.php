@@ -12,6 +12,7 @@ use App\Models\Post;
 class PostController extends Controller
 {
     //TODO: Create route for searching posts
+    //TODO: Create middleware to check if post is for current user
     /**
      * Display a listing of the resource.
      *
@@ -116,15 +117,14 @@ class PostController extends Controller
     public function saveComment(Request $request, Post $post)
     {
         $currentUser = auth()->user();
-        if($post["user_id"] === $currentUser["id"]){
             try {
                 $comment = Comment::create($request->all());
                 $post->comments()->save($comment);
+                $currentUser->comments()->save($comment);
                 return response()->json(["comment"=>$comment],200);
             }catch (\Exception $e) {
                 return response()->json(['error'=>$e->getMessage()], 500);
             }
-        }
     }
 
     public function viewComments(Post $post) {
@@ -136,13 +136,14 @@ class PostController extends Controller
         }
     }
 
-    public function deleteComment(Post $post, Comment $comment) {
+    public function deleteComment(Comment $comment) {
+        $currentUser = auth()->user();
         try {
-            if($post["id"] === $comment["post_id"]){
+            if($comment['user_id'] === $currentUser['id']){
                 $comment->delete();
                 return response()->json($comment, 200);
             } else {
-                return response()->json(["error" => "Comment does not exits"], 404);
+                return response()->json(["error" => "You are not allowed to perform this function"], 404);
             }
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);

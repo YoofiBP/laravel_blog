@@ -154,11 +154,11 @@ class PostTest extends TestCase
     public function testShouldCreateCommentForPostSuccessfully() {
         $commentJson = ['comment_body' => "This is a test comment"];
         $this->user = Sanctum::actingAs(User::factory()->has(Post::factory()->count(3))->create(),['users:getAll']);
-        $userIdFromDB = User::where('email', $this->user["email"])->first()["id"];
-        $postIdFromDB = Post::where('user_id', $userIdFromDB)->first()["id"];
+        $userId = $this->user["id"];
+        $postIdFromDB = $this->user->posts[0]["id"];
         $response = $this->withHeader("Accept", "application/json")->post(route('comments.store', ["post" => $postIdFromDB]), $commentJson);
         $response->assertStatus(200);
-        $this->assertDatabaseHas('comments', ['post_id' => $postIdFromDB, 'comment_body' => $commentJson["comment_body"]]);
+        $this->assertDatabaseHas('comments', ['post_id' => $postIdFromDB, 'comment_body' => $commentJson["comment_body"], "user_id" => $userId]);
     }
 
     public function testShouldNotCreateCommentIfUnauthenticated() {
@@ -189,23 +189,21 @@ class PostTest extends TestCase
     }
 
     public function testShouldDeleteCommentSuccessfully() {
-        $this->user = Sanctum::actingAs(User::factory()->has(Post::factory()->has(Comment::factory())->count(3))->create(),['users:getAll']);
-        $postId = $this->user->posts[0]["id"];
-        $commentId = $this->user->posts[0]->comments[0]["id"];
-        $this->assertDatabaseHas('comments', ['id' => $commentId]);
-        $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["post" => $postId, "comment" => $commentId]));
+        $this->user = Sanctum::actingAs(User::factory()->has(Comment::factory()->count(3))->create(),['users:getAll']);
+        $commentId = $this->user->comments[0]["id"];
+        $this->assertDatabaseHas('comments', ['id' => $commentId, 'user_id' => $this->user["id"]]);
+        $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["comment" => $commentId]));
         $response->assertStatus(200);
         $this->assertDatabaseMissing('comments', ['id' => $commentId]);
+        $this->assertDatabaseMissing('comments', ['id' => $commentId, 'user_id' => $this->user["id"]]);
     }
 
-    public function testShouldNotDeleteCommentIfNotFound() {
-        $this->user = Sanctum::actingAs(User::factory()->has(Post::factory()->has(Comment::factory())->count(3))->create(),['users:getAll']);
-        $postId = $this->user->posts[1]["id"];
-        $commentId = $this->user->posts[0]->comments[0]["id"];
-        $this->assertDatabaseHas('comments', ['id' => $commentId]);
-        $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["post" => $postId, "comment" => $commentId]));
+    public function testShouldNotDeleteCommentIfNotCommentOwner() {
+        $otherUser = User::factory()->has(Comment::factory()->count(3))->create();
+        $this->user = Sanctum::actingAs(User::factory()->has(Comment::factory()->count(3))->create(),['users:getAll']);
+        $commentId = $otherUser->comments[0]["id"];
+        $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["comment" => $commentId]));
         $response->assertStatus(404);
-        $response->assertJsonStructure(['error']);
         $this->assertDatabaseHas('comments', ['id' => $commentId]);
     }
 
@@ -217,5 +215,7 @@ class PostTest extends TestCase
         $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["post" => $postId, "comment" => $commentId]));
         $response->assertStatus(401);
     }
+
+
 
 }

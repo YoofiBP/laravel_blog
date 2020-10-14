@@ -179,7 +179,7 @@
       <workItem from="1602532655798" duration="9944000" />
       <workItem from="1602583019931" duration="4637000" />
       <workItem from="1602611390044" duration="12982000" />
-      <workItem from="1602682604608" duration="8662000" />
+      <workItem from="1602682604608" duration="13569000" />
     </task>
     <servers />
   </component>
@@ -196,10 +196,11 @@
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="341" y="140" key="SettingsEditor/0.23.1680.957@0.23.1680.957" timestamp="1602583049869" />
-    <state x="505" y="233" width="670" height="677" key="search.everywhere.popup" timestamp="1602693470923">
-      <screen x="0" y="23" width="1680" height="961" />
+    <state x="505" y="234" width="670" height="680" key="search.everywhere.popup" timestamp="1602697863728">
+      <screen x="0" y="23" width="1680" height="964" />
     </state>
-    <state x="505" y="233" width="670" height="677" key="search.everywhere.popup/-1920.23.1920.1057/0.23.1680.961@0.23.1680.961" timestamp="1602693470923" />
+    <state x="505" y="233" width="670" height="677" key="search.everywhere.popup/-1920.23.1920.1057/0.23.1680.961@0.23.1680.961" timestamp="1602695831240" />
+    <state x="505" y="234" width="670" height="680" key="search.everywhere.popup/-1920.23.1920.1057/0.23.1680.964@0.23.1680.964" timestamp="1602697863728" />
     <state x="505" y="232" width="670" height="674" key="search.everywhere.popup/0.23.1680.957@0.23.1680.957" timestamp="1602628754644" />
     <state x="505" y="233" width="670" height="675" key="search.everywhere.popup/0.23.1680.959@0.23.1680.959" timestamp="1602331008352" />
     <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.23.1680.961@0.23.1680.961" timestamp="1602354257084" />
