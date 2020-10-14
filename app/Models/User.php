@@ -91,9 +91,9 @@ class User extends Authenticatable
     public function generateAuthToken() {
         $user = $this;
         if($user->isAdmin){
-            $token = $user->createToken('login-token', ['users:getAll']);
+            $token = $user->createToken('login-token', ['role:admin']);
         } else {
-            $token = $user->createToken('token-name', ['users:viewOnly']);
+            $token = $user->createToken('token-name', ['role:user']);
         }
         return $token->plainTextToken;
     }

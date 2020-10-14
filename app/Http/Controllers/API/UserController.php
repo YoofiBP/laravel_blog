@@ -11,7 +11,14 @@ use App\Http\Controllers\Controller;
 class UserController extends Controller
 {
     public function __construct() {
-        $this->middleware('check.role:users:getAll')->only(['index', 'destroy']);
+        $this->middleware('check.role:role:admin')->only(['index', 'destroy']);
+    }
+
+    public function validateEntries($input, $rules) {
+        $validator = Validator::make($input, $rules);
+        if($validator->fails()){
+            return $validator->messages();
+        }
     }
 
     /**
@@ -31,8 +38,8 @@ class UserController extends Controller
     }
 
     public function logout() {
-        $user = auth()->user();
         try {
+            $user = auth()->user();
             $user->currentAccessToken()->delete();
             return response(["message"=>"See you soon!"], 200);
         } catch (\Exception $e){
@@ -46,28 +53,32 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+
+
     public function signUp(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             "name" => ['required'],
             "password" => ['min:6','required'],
             "email" => ['email:rfc,dns', 'required'],
             "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057', 'required']
-        ]);
+        ];
 
-        if($validator->fails()){
-            return response()->json($validator->messages(),400);
+        $validationMessages = $this->validateEntries($request->all(), $rules);
+
+        if($validationMessages){
+            return response()->json($validationMessages, 400);
+        } else {
+            try {
+                $user = User::create($request->all());
+                $user->save();
+                $token = $user->generateAuthToken();
+                return response(["user" => $user, "token" => $token], 201);
+            } catch (\Exception $e) {
+                return response(["error" => $e->getMessage()], 500);
+            }
         }
-
-        try {
-            $user = User::create($request->all());
-            $user->save();
-            $token = $user->generateAuthToken();
-            return response(["user"=>$user, "token"=>$token], 201);
-        } catch (\Exception $e) {
-            return response(["error"=>$e->getMessage()], 500);
-        }
-
     }
 
     /**
@@ -91,20 +102,22 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             "email" => ['email:rfc,dns'],
             "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057']
-        ]);
+        ];
 
-        if($validator->fails()){
-            return response()->json($validator->messages(),400);
-        }
+        $validationMessages = $this->validateEntries($request->all(), $rules);
 
-        try {
-            $user->update($request->all());
-            return response()->json($user, 200);
-        }  catch (\Exception $e) {
-            return response()->json(["error"=>"An error occurred"], 500);
+        if($validationMessages){
+            return response()->json($validationMessages,400);
+        } else {
+            try {
+                $user->update($request->all());
+                return response()->json($user, 200);
+            }  catch (\Exception $e) {
+                return response()->json(["error"=>"An error occurred"], 500);
+            }
         }
 
     }

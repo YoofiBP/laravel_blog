@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/login', [UserController::class, 'login'])->name("login")->withoutMiddleware(['auth:sanctum']);
         Route::post('/signup',[UserController::class, 'signUp'])->name("user.signup")->withoutMiddleware(['auth:sanctum']);
         Route::get('/me', [UserController::class, 'getUser'])->name('user.getUser');
-        Route::delete('/', [UserController::class, 'deleteMe'])->name('user.deleteMe');
+        Route::delete('/me', [UserController::class, 'deleteMe'])->name('user.deleteMe');
         Route::post('/logout', [UserController::class, 'logout'])->name('logout');
         Route::get('/', [UserController::class, 'index'])->name('user.index');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('user.destroy');

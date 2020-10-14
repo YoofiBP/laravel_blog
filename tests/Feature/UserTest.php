@@ -139,7 +139,7 @@ class UserTest extends TestCase
 
     public function testShouldGetAllUsersWhenUserHasAdminRole() {
         User::factory()->count(2)->create();
-        $this->user = Sanctum::actingAs(User::factory()->create(),['users:getAll']);
+        $this->user = Sanctum::actingAs(User::factory()->create(),['role:admin']);
         $response = $this->withHeader("Accept", "application/json")->get(route('user.index'));
 
         $response->assertStatus(200);
@@ -148,7 +148,7 @@ class UserTest extends TestCase
 
     public function testShouldNotGetAllUsersWhenUserDoesNotHaveAdminRole() {
         User::factory()->count(2)->create();
-        $this->user = Sanctum::actingAs(User::factory()->create(),['users:viewOnly']);
+        $this->user = Sanctum::actingAs(User::factory()->create(),['role:user']);
         $response = $this->withHeader("Accept", "application/json")->get(route('user.index'));
 
         $response->assertStatus(403);
@@ -158,7 +158,7 @@ class UserTest extends TestCase
     //TODO: Add test to ensure that when user is an admin the token generated is different for him
 
     public function testShouldDeleteUsersWhenUserHasAdminRole()  {
-        $this->user = Sanctum::actingAs(User::factory()->create(),['users:getAll']);
+        $this->user = Sanctum::actingAs(User::factory()->create(),['role:admin']);
         $userId = User::first()["id"];
 
         $response = $this->withHeader("Accept", "application/json")->delete(route('user.destroy', ['user' => $userId]));
@@ -178,7 +178,7 @@ class UserTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens',1);
         $this->assertDatabaseHas('personal_access_tokens', ['tokenable_id' => $loggedInUserId]);
 
-        $this->user = Sanctum::actingAs(User::factory()->create(),['users:getAll']);
+        $this->user = Sanctum::actingAs(User::factory()->create(),['role:admin']);
         $this->withHeader("Accept", "application/json")->delete(route('user.destroy', ['user' => $loggedInUserId]));
 
         $this->assertDatabaseCount('personal_access_tokens',0);
