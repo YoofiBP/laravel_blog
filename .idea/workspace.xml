@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d181624f-89eb-4ca3-bdf5-16d7b3858c10" name="Default Changelist" comment="" />
+    <list default="true" id="d181624f-89eb-4ca3-bdf5-16d7b3858c10" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/API/PostController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/API/PostController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/API/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/API/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/PostTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/PostTest.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +20,9 @@
   <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -131,6 +141,7 @@
     </include_path>
   </component>
   <component name="ProjectId" id="1iH0etOI9JG3eYSkcPgK846AMQw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -179,7 +190,10 @@
       <workItem from="1602532655798" duration="9944000" />
       <workItem from="1602583019931" duration="4637000" />
       <workItem from="1602611390044" duration="12982000" />
-      <workItem from="1602682604608" duration="17613000" />
+      <workItem from="1602682604608" duration="20099000" />
+      <workItem from="1602763973431" duration="5358000" />
+      <workItem from="1602777162629" duration="2201000" />
+      <workItem from="1602780849759" duration="4135000" />
     </task>
     <servers />
   </component>
@@ -196,13 +210,13 @@
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="341" y="140" key="SettingsEditor/0.23.1680.957@0.23.1680.957" timestamp="1602583049869" />
-    <state x="505" y="234" width="670" height="680" key="search.everywhere.popup" timestamp="1602705188604">
-      <screen x="0" y="23" width="1680" height="964" />
+    <state x="505" y="232" width="670" height="674" key="search.everywhere.popup" timestamp="1602794948225">
+      <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="505" y="233" width="670" height="677" key="search.everywhere.popup/-1920.23.1920.1057/0.23.1680.961@0.23.1680.961" timestamp="1602695831240" />
     <state x="505" y="234" width="670" height="680" key="search.everywhere.popup/-1920.23.1920.1057/0.23.1680.964@0.23.1680.964" timestamp="1602705188604" />
-    <state x="505" y="232" width="670" height="674" key="search.everywhere.popup/0.23.1680.957@0.23.1680.957" timestamp="1602628754644" />
-    <state x="505" y="233" width="670" height="675" key="search.everywhere.popup/0.23.1680.959@0.23.1680.959" timestamp="1602331008352" />
-    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.23.1680.961@0.23.1680.961" timestamp="1602354257084" />
+    <state x="505" y="232" width="670" height="674" key="search.everywhere.popup/0.23.1680.957@0.23.1680.957" timestamp="1602794948225" />
+    <state x="505" y="233" width="670" height="675" key="search.everywhere.popup/0.23.1680.959@0.23.1680.959" timestamp="1602785611082" />
+    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.23.1680.961@0.23.1680.961" timestamp="1602773966768" />
   </component>
 </project>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
+    //TODO: Implement something with query strings https://laravel.com/docs/8.x/requests#retrieving-input
     public function __construct() {
         $this->middleware('check.role:role:admin')->only(['index', 'destroy']);
     }
@@ -61,7 +62,7 @@ class UserController extends Controller
         $rules = [
             "name" => ['required'],
             "password" => ['min:6','required'],
-            "email" => ['email:rfc,dns', 'required'],
+            "email" => ['email', 'required'],
             "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057', 'required']
         ];
 
@@ -103,20 +104,20 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $rules = [
-            "email" => ['email:rfc,dns'],
+            "email" => ['email'],
             "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057']
         ];
 
-        $validationMessages = $this->validateEntries($request->all(), $rules);
+        $validationMessages = $this->validateEntries($request->except('password'), $rules);
 
         if($validationMessages){
             return response()->json($validationMessages,400);
         } else {
             try {
-                $user->update($request->all());
+                $user->update($request->except('password'));
                 return response()->json($user, 200);
             }  catch (\Exception $e) {
-                return response()->json(["error"=>"An error occurred"], 500);
+                return response()->json(["error"=>$e->getMessage()], 500);
             }
         }
 

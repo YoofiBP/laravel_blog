@@ -200,10 +200,10 @@ class PostTest extends TestCase
 
     public function testShouldNotDeleteCommentIfNotCommentOwner() {
         $otherUser = User::factory()->has(Comment::factory()->count(3))->create();
-        $this->user = Sanctum::actingAs(User::factory()->has(Comment::factory()->count(3))->create(),['users:getAll']);
+        $this->user = Sanctum::actingAs(User::factory()->has(Comment::factory()->count(3))->create(),['role:admin']);
         $commentId = $otherUser->comments[0]["id"];
         $response = $this->withHeader("Accept", "application/json")->delete(route('comments.destroy', ["comment" => $commentId]));
-        $response->assertStatus(404);
+        $response->assertStatus(403);
         $this->assertDatabaseHas('comments', ['id' => $commentId]);
     }
 

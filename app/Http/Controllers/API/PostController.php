@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-//use Dotenv\Validator;
+
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +13,13 @@ class PostController extends Controller
 {
     //TODO: Create route for searching posts
     //TODO: Create middleware to check if post is for current user
+    //TODO: Implement file upload management
+    public function __construct()
+    {
+        $this->middleware('can:update,post')->only('show', 'update', 'destroy');
+        $this->middleware('can:delete,comment')->only('deleteComment');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,8 +31,8 @@ class PostController extends Controller
             $currentUser = auth()->user();
             $userPosts = $currentUser->posts;
             return response()->json($userPosts, 200);
-        } catch ( \Exception $e){
-            return response()->json(["error" => $e->getMessage()] ,500);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 500);
         }
 
     }
@@ -33,7 +40,7 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -44,7 +51,7 @@ class PostController extends Controller
             'post_body' => ['required']
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->messages(), 400);
         }
 
@@ -54,80 +61,76 @@ class PostController extends Controller
             $currentUser->posts()->save($post);
             return response()->json(["post" => $post], 201);
         } catch (\Exception $e) {
-            return response()->json(['error'=>$e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show(Post $post)
     {
-        $currentUser = auth()->user();
-        if($post["user_id"] === $currentUser["id"]){
-            return response()->json($post, 200);
-        } else {
-            return response()->json(["error"=>"You are not authorized to view this"],403);
-        }
+        //Gate::authorize('update', $post);
+        return response()->json($post, 200);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Post $post)
     {
-        $currentUser = auth()->user();
-        if($post["user_id"] === $currentUser["id"]){
-            try {
-                $currentUser->posts()->update($request->all());
-                return response()->json($post, 200);
-            } catch (\Exception $e){
-                return response()->json(["error"=>"An error occured"],500);
-            }
-
-        } else {
-            return response()->json(["error"=>"You are not authorized to view this"],403);
+        //Gate::authorize('update', $post);
+        try {
+            $currentUser = auth()->user();
+            $currentUser->posts()->update($request->all());
+            return response()->json($post, 200);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "An error occurred"], 500);
         }
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Post $post)
     {
-        $currentUser = auth()->user();
-        if($post["user_id"] === $currentUser["id"]){
+        //Gate::authorize('update', $post);
+        try {
             $post->delete();
-            return response()->json($post,200);
-        } else {
-            return response()->json(["error"=>"You are not authorized to view this"], 403);
+            return response()->json($post, 200);
+        } catch (\Exception $e){
+            return response()->json(["error" => $e->getMessage()], 500);
         }
+
     }
 
     public function saveComment(Request $request, Post $post)
     {
         $currentUser = auth()->user();
-            try {
-                $comment = Comment::create($request->all());
-                $post->comments()->save($comment);
-                $currentUser->comments()->save($comment);
-                return response()->json(["comment"=>$comment],200);
-            }catch (\Exception $e) {
-                return response()->json(['error'=>$e->getMessage()], 500);
-            }
+        try {
+            $comment = Comment::create($request->all());
+            $post->comments()->save($comment);
+            $currentUser->comments()->save($comment);
+            return response()->json(["comment" => $comment], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
-    public function viewComments(Post $post) {
+    public function viewComments(Post $post)
+    {
         try {
             $comments = $post->comments;
             return response()->json($comments, 200);
@@ -136,17 +139,14 @@ class PostController extends Controller
         }
     }
 
-    public function deleteComment(Comment $comment) {
-        $currentUser = auth()->user();
+    public function deleteComment(Comment $comment)
+    {
         try {
-            if($comment['user_id'] === $currentUser['id']){
-                $comment->delete();
-                return response()->json($comment, 200);
-            } else {
-                return response()->json(["error" => "You are not allowed to perform this function"], 404);
-            }
+            $comment->delete();
+            return response()->json($comment, 200);
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);
         }
     }
+
 }
