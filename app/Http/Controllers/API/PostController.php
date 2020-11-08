@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 
+use App\Http\Requests\StorePost;
+use App\Http\Requests\UpdatePost;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,7 +14,6 @@ use App\Models\Post;
 class PostController extends Controller
 {
     //TODO: Create route for searching posts
-    //TODO: Create middleware to check if post is for current user
     //TODO: Implement file upload management
     public function __construct()
     {
@@ -43,21 +44,13 @@ class PostController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePost $request)
     {
-        $validator = Validator::make($request->all(), [
-            'post_title' => ['required'],
-            'post_description' => ['required'],
-            'post_body' => ['required']
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->messages(), 400);
-        }
+        $data = $request->validated();
 
         try {
             $currentUser = auth()->user();
-            $post = Post::create($request->all());
+            $post = Post::create($data);
             $currentUser->posts()->save($post);
             return response()->json(["post" => $post], 201);
         } catch (\Exception $e) {
@@ -73,7 +66,6 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //Gate::authorize('update', $post);
         return response()->json($post, 200);
     }
 
@@ -84,12 +76,11 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(UpdatePost $request, Post $post)
     {
-        //Gate::authorize('update', $post);
+        $data = $request->validated();
         try {
-            $currentUser = auth()->user();
-            $currentUser->posts()->update($request->all());
+            $post->update($data);
             return response()->json($post, 200);
         } catch (\Exception $e) {
             return response()->json(["error" => "An error occurred"], 500);

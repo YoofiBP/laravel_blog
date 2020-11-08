@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\StoreUser;
+use App\Http\Requests\UpdateUser;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -11,15 +14,10 @@ use App\Http\Controllers\Controller;
 class UserController extends Controller
 {
     //TODO: Implement something with query strings https://laravel.com/docs/8.x/requests#retrieving-input
-    public function __construct() {
-        $this->middleware('check.role:role:admin')->only(['index', 'destroy']);
-    }
 
-    public function validateEntries($input, $rules) {
-        $validator = Validator::make($input, $rules);
-        if($validator->fails()){
-            return $validator->messages();
-        }
+    public function __construct()
+    {
+        $this->middleware('check.role:role:admin')->only(['index', 'destroy']);
     }
 
     /**
@@ -32,60 +30,51 @@ class UserController extends Controller
         try {
             $users = User::all();
             return response($users, 200);
-        } catch (\Exception $e){
-            return response(["error"=>$e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return response(["error" => $e->getMessage()], 500);
         }
 
     }
 
-    public function logout() {
+    public function logout()
+    {
         try {
             $user = auth()->user();
             $user->currentAccessToken()->delete();
-            return response(["message"=>"See you soon!"], 200);
-        } catch (\Exception $e){
-            return response(["error"=>$e->getMessage()],500);
+            return response(["message" => "See you soon!"], 200);
+        } catch (\Exception $e) {
+            return response(["error" => $e->getMessage()], 500);
         }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
 
 
-
-    public function signUp(Request $request)
+    public function signUp(StoreUser $request)
     {
-        $rules = [
-            "name" => ['required'],
-            "password" => ['min:6','required'],
-            "email" => ['email', 'required'],
-            "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057', 'required']
-        ];
+        //TODO: Refactor to move user creation logic out of controller
 
-        $validationMessages = $this->validateEntries($request->all(), $rules);
+        $data = $request->validated();
 
-        if($validationMessages){
-            return response()->json($validationMessages, 400);
-        } else {
-            try {
-                $user = User::create($request->all());
-                $user->save();
-                $token = $user->generateAuthToken();
-                return response(["user" => $user, "token" => $token], 201);
-            } catch (\Exception $e) {
-                return response(["error" => $e->getMessage()], 500);
-            }
+        try {
+            $user = User::create($data);
+            $user->save();
+            $token = $user->generateAuthToken();
+            return response(["user" => $user, "token" => $token], 201);
+        } catch (\Exception $e) {
+            return response(["error" => $e->getMessage()], 500);
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function getUser()
@@ -97,28 +86,20 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUser $request, User $user)
     {
-        $rules = [
-            "email" => ['email'],
-            "phoneNo" => ['size:10','starts_with:024,054,059,055,020,050,026,056,027,057']
-        ];
 
-        $validationMessages = $this->validateEntries($request->except('password'), $rules);
+        $data = $request->validated();
 
-        if($validationMessages){
-            return response()->json($validationMessages,400);
-        } else {
-            try {
-                $user->update($request->except('password'));
-                return response()->json($user, 200);
-            }  catch (\Exception $e) {
-                return response()->json(["error"=>$e->getMessage()], 500);
-            }
+        try {
+            $user->update($data);
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 500);
         }
 
     }
@@ -126,39 +107,42 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-            try {
-                $user = User::where('id',$id)->first();
-                User::deleteUser($user);
-                return response(["message"=>"User: deleted"], 200);
-            } catch (\Exception $e){
-                return response(["error"=>$e->getMessage()], 500);
-            }
-    }
-
-    public function deleteMe(){
-        $user = auth()->user();
+        //Refactor out delete user function to handle all deletion
         try {
+            $user = User::where('id', $id)->first();
             User::deleteUser($user);
-            return response()->json(["message"=>"Sad to see you go"], 200);
-        }catch (\Exception $e){
-            return response()->json(["error"=>$e->getMessage()], 500);
+            return response(["message" => "User: deleted"], 200);
+        } catch (\Exception $e) {
+            return response(["error" => $e->getMessage()], 500);
         }
     }
 
-    public function login(Request $request) {
+    public function deleteMe()
+    {
+        $user = auth()->user();
+        try {
+            User::deleteUser($user);
+            return response()->json(["message" => "Sad to see you go"], 200);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 500);
+        }
+    }
+
+    public function login(Request $request)
+    {
         $email = $request["email"];
         $password = $request["password"];
         try {
             $user = User::getUserWithCredentials($email, $password);
             $token = $user->generateAuthToken();
-            return response()->json(["user"=>$user, "token"=>$token],200);
-        } catch (\Exception $e){
-            return response()->json(["error"=>$e->getMessage()],404);
+            return response()->json(["user" => $user, "token" => $token], 200);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 404);
         }
 
     }
