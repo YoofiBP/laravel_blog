@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Http\Resources\User as UserResource;
 use App\Http\Controllers\Controller;
 
 class UserController extends Controller
@@ -28,12 +29,11 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::all();
-            return response($users, 200);
+            $users = UserResource::collection(User::all());
+            return response()->json($users, 200);
         } catch (\Exception $e) {
             return response(["error" => $e->getMessage()], 500);
         }
-
     }
 
     public function logout()
